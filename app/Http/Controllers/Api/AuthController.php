@@ -86,12 +86,20 @@ class AuthController extends Controller
      */
     public function show($id)
     {
-       $user = User::find($id);
+        try {
+            $user =  User::findOrFail($id);
 
-        return response()->json([
-            "message" => 'Display the specified resource.',
-            "data" => $user
-        ]);
+            return response()->json([
+                'success' => true,
+                "message" => 'Display the specified resource.',
+            ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                "message" => 'Something wrong.',
+            ]);
+        }
     }
 
     /**
@@ -114,7 +122,40 @@ class AuthController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // return $request->all();
+       $validator = Validator::make($request->all(),[
+        'name' => 'required|string',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:6',
+       ]);
+
+       if($validator->fails()){
+            return response()->json([
+                "success" => false,
+                "errors"=>$validator->errors()
+            ],401);
+       }
+
+       try {
+
+            $user =  User::findOrFail($id);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return response()->json([
+                "data" => $user,
+                "success" => true,
+                "errors"=>"User updated successfully."
+            ],200);
+
+       } catch (\Exception $e) {
+            return response()->json([
+                "success" => false,
+                "errors"=>"Somthing wrong"
+            ],204);
+       }
     }
 
     /**
@@ -126,10 +167,22 @@ class AuthController extends Controller
     public function destroy($id)
     {
         // return User::destroy($id);
-        $user =  User::find($id)->delete();
-        return response()->json([
-            "message" => 'Remove the specified resource from storage.',
-            "data" => $user
-        ]);
+
+        try {
+            $user =  User::findOrFail($id)->delete();
+
+            return response()->json([
+                'success' => true,
+                "message" => 'User deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                "message" => 'Something wrong.',
+            ]);
+        }
+
+
     }
 }
