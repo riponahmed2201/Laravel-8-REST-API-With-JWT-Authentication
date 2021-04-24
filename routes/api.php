@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-// Route::get('/users', [AuthController::class, 'index']);
 
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
+
+// Route::get('/users', [AuthController::class, 'index']);
 Route::resource('/users', AuthController::class);
+
