@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
+use Illuminate\Routing\RouteGroup;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,10 +22,21 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
+// Here v1 and v2 prefix for version control
+Route::prefix('v1')->group(function(){
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
+    // Route::get('/users', [AuthController::class, 'index']);
+    Route::resource('/users', AuthController::class);
 
-// Route::get('/users', [AuthController::class, 'index']);
-Route::resource('/users', AuthController::class);
+    // All Post Routes
+    // Route::middleware('auth:api')->group(function () {
+        Route::resource('/posts', PostController::class);
+    // });
 
+});
+
+Route::prefix('v2')->group(function(){
+    //to do
+});
